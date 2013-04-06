@@ -82,7 +82,27 @@ def depthFirstSearch(problem):
   print "Start's successors:", problem.getSuccessors(problem.getStartState())
   """
   "*** YOUR CODE HERE ***"
-   
+  """
+  Start: (5, 5)
+  Is the start a goal? False 
+  Start's successors: [((5, 4), 'South', 1), ((4, 5), 'West', 1)]
+  Path found with total cost of 999999 in 0.0 seconds
+  Search nodes expanded: 1
+  """
+  s = Stack;
+  nodeVisited = [];
+  nodeVisited.append(problem.getStartState());
+  actions = [];
+  
+def dfsHelper(problem, nextState, nodeVisited, actions):
+  curPos = currentState[0];
+  if curPos in nodeVisited:
+    return False;
+  nodeVisited.append(cusPos);
+  actions.append(currentState);
+  if (problem.isGoal(curPos)):
+    return True;
+  
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
