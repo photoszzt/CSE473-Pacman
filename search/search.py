@@ -89,20 +89,36 @@ def depthFirstSearch(problem):
   Path found with total cost of 999999 in 0.0 seconds
   Search nodes expanded: 1
   """
-  s = Stack;
+  "import pdb;pdb.set_trace();"
+
   nodeVisited = [];
+  actions = {};
+  result = util.Stack();
+  bufferedAction = util.Stack();
   nodeVisited.append(problem.getStartState());
-  actions = [];
-  
-def dfsHelper(problem, nextState, nodeVisited, actions):
-  curPos = currentState[0];
-  if curPos in nodeVisited:
-    return False;
-  nodeVisited.append(cusPos);
-  actions.append(currentState);
-  if (problem.isGoal(curPos)):
-    return True;
-  
+  result.push(problem.getStartState());
+  bufferedAction.push('');
+  actions[problem.getStartState()] = [];
+  preState = problem.getStartState();
+  while (not result.isEmpty()):
+    next = result.pop();
+    nextAction = bufferedAction.pop();
+    prev = actions.get(preState)[:];
+    prev.append(nextAction);
+    actions[next] = prev;
+    if (problem.isGoalState(next)):
+      print "actions: ", actions 
+      prev.remove('');
+      return prev;
+    adjacent = problem.getSuccessors(next);
+    length = len(adjacent);
+    for i in range(0, length):
+      v = adjacent[i];
+      if (not (v[0] in nodeVisited)):
+        nodeVisited.append(v[0]);
+        result.push(v[0]);
+        bufferedAction.push(v[1]);
+    preState = next;
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
