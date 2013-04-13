@@ -68,68 +68,148 @@ def tinyMazeSearch(problem):
   return  [s,s,w,s,w,w,s,w]
 
 def depthFirstSearch(problem):
-  """
-  Search the deepest nodes in the search tree first [p 85].
-  
-  Your search algorithm needs to return a list of actions that reaches
-  the goal.  Make sure to implement a graph search algorithm [Fig. 3.7].
-  
-  To get started, you might want to try some of these simple commands to
-  understand the search problem that is being passed in:
-  
-  print "Start:", problem.getStartState()
-  print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-  print "Start's successors:", problem.getSuccessors(problem.getStartState())
-  """
-  "*** YOUR CODE HERE ***"
-  """
-  Start: (5, 5)
-  Is the start a goal? False 
-  Start's successors: [((5, 4), 'South', 1), ((4, 5), 'West', 1)]
-  Path found with total cost of 999999 in 0.0 seconds
-  Search nodes expanded: 1
-  """
-  "import pdb;pdb.set_trace();"
+    """
+    Search the deepest nodes in the search tree first [p 85].
+      
+    Your search algorithm needs to return a list of actions that reaches
+    the goal.  Make sure to implement a graph search algorithm [Fig. 3.7].
+      
+    To get started, you might want to try some of these simple commands to
+    understand the search problem that is being passed in:
+      
+    print "Start:", problem.getStartState()
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    """
+    "*** YOUR CODE HERE ***"
+    """
+    Start: (5, 5)
+    Is the start a goal? False 
+    Start's successors: [((5, 4), 'South', 1), ((4, 5), 'West', 1)]
+    Path found with total cost of 999999 in 0.0 seconds
+    Search nodes expanded: 1
+    """
+    if (problem.isGoalState(problem.getStartState())):
+        return [];
+    nodeVisited = [];
+    stack = util.Stack();
+    nodeVisited.append(problem.getStartState());
+    stack.push([problem.getStartState(), '']);
+    parentMap = {};
+    while (not stack.isEmpty()):
+      nextNode = stack.pop();
+      nextPos = nextNode[0];
+      nextAction = nextNode[1];
+      if (problem.isGoalState(nextPos)):
+        cur = nextPos;
+        actions = [];
+        while (1):
+            temp = parentMap.get(cur);
+            if (temp == None):
+                break;
+            cur = temp[0];
+            actions.append(temp[1]);
+        actions.reverse();
+        actions.append(nextAction);
+        actions.remove('');
+        return actions;
+      adjacent = problem.getSuccessors(nextPos);
+      length = len(adjacent);
+      for i in range(0, length):
+        v = adjacent[i];
+        if (not (v[0] in nodeVisited or [v[0], v[1]] in stack.list)):
+          nodeVisited.append(v[0]);
+          stack.push([v[0], v[1]]);
+          parentMap[v[0]] = [nextPos, nextAction]; 
 
-  nodeVisited = [];
-  actions = {};
-  result = util.Stack();
-  bufferedAction = util.Stack();
-  nodeVisited.append(problem.getStartState());
-  result.push(problem.getStartState());
-  bufferedAction.push('');
-  actions[problem.getStartState()] = [];
-  preState = problem.getStartState();
-  while (not result.isEmpty()):
-    next = result.pop();
-    nextAction = bufferedAction.pop();
-    prev = actions.get(preState)[:];
-    prev.append(nextAction);
-    actions[next] = prev;
-    if (problem.isGoalState(next)):
-      print "actions: ", actions 
-      prev.remove('');
-      return prev;
-    adjacent = problem.getSuccessors(next);
-    length = len(adjacent);
-    for i in range(0, length):
-      v = adjacent[i];
-      if (not (v[0] in nodeVisited)):
-        nodeVisited.append(v[0]);
-        result.push(v[0]);
-        bufferedAction.push(v[1]);
-    preState = next;
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 81]"
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
-      
+  if (problem.isGoalState(problem.getStartState())):
+        return [];
+  nodeVisited = [];
+  queue = util.Queue();
+  nodeVisited.append(problem.getStartState());
+  queue.push([problem.getStartState(), '']);
+  parentMap = {};
+  while (not queue.isEmpty()):
+    nextNode = queue.pop();
+    nextPos = nextNode[0];
+    nextAction = nextNode[1];
+    if (problem.isGoalState(nextPos)):
+      cur = nextPos;
+      actions = [];
+      while (1):
+          temp = parentMap.get(cur);
+          if (temp == None):
+              break;
+          cur = temp[0];
+          actions.append(temp[1]);
+      actions.reverse();
+      actions.append(nextAction);
+      actions.remove('');
+      return actions;
+    adjacent = problem.getSuccessors(nextPos);
+    length = len(adjacent);
+    for i in range(0, length):
+      v = adjacent[i];
+      if (not (v[0] in nodeVisited or [v[0], v[1]] in queue.list)):
+        nodeVisited.append(v[0]);
+        queue.push([v[0], v[1]]);
+        parentMap[v[0]] = [nextPos, nextAction]; 
+  
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
-
+  nodeVisited = [];
+  queue = util.PriorityQueue();
+  nodeVisited.append(problem.getStartState());
+  queue.push([problem.getStartState(), '', 0], 0);
+  parentMap = {};
+  while (not queue.isEmpty()):
+    nextNode = queue.pop();
+    nextPos = nextNode[0];
+    nextAction = nextNode[1];
+    nextCost = nextNode[2];
+    if (problem.isGoalState(nextPos)):
+      cur = nextPos;
+      actions = [];
+      while (1):
+          temp = parentMap.get(cur);
+          if (temp == None):
+              break;
+          cur = temp[0];
+          actions.append(temp[1]);
+      actions.reverse();
+      actions.append(nextAction);
+      actions.remove('');
+      return actions;
+    adjacent = problem.getSuccessors(nextPos);
+    length = len(adjacent);
+    for i in range(0, length):
+      v = adjacent[i];
+      searchNode = search(queue, [v[0], v[1]]);
+      if (not (v[0] in nodeVisited or searchNode[0])):
+        nodeVisited.append(v[0]);
+        queue.push([v[0], v[1], nextCost+v[2]], nextCost+v[2]);
+        parentMap[v[0]] = [nextPos, nextAction];
+      elif (searchNode[0] and searchNode[1] > nextCost+v[2]):
+        del queue.heap[searchNode[2]];
+        queue.push([v[0], v[1], nextCost+v[2]], nextCost+v[2]);
+        parentMap[v[0]] = [nextPos, nextAction];  
+        
+def search(queue, node):
+    """
+    Search the node in the PriorityQueue. If found return the priority. 
+    """
+    length = len(queue.heap);
+    for i in range(0, length):
+        state = queue.heap[i];
+        if (state[1] == node[0] and state[2] == node[1]):
+            return True, state[0], i;
+    return False, None, None;
+          
 def nullHeuristic(state, problem=None):
   """
   A heuristic function estimates the cost from the current state to the nearest
