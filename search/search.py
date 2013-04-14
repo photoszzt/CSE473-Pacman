@@ -190,13 +190,14 @@ def uniformCostSearch(problem):
     for i in range(0, length):
       v = adjacent[i];
       searchNode = search(queue, [v[0], v[1]]);
+      newCost = nextCost + v[2];
       if (not (v[0] in nodeVisited or searchNode[0])):
         nodeVisited.append(v[0]);
-        queue.push([v[0], v[1], nextCost+v[2]], nextCost+v[2]);
+        queue.push([v[0], v[1], newCost], newCost);
         parentMap[v[0]] = [nextPos, nextAction];
-      elif (searchNode[0] and searchNode[1] > nextCost+v[2]):
+      elif (searchNode[0] and searchNode[1] > newCost):
         del queue.heap[searchNode[2]];
-        queue.push([v[0], v[1], nextCost+v[2]], nextCost+v[2]);
+        queue.push([v[0], v[1], newCost], newCost);
         parentMap[v[0]] = [nextPos, nextAction];  
         
 def search(queue, node):
@@ -220,7 +221,44 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  nodeVisited = [];
+  queue = util.PriorityQueue();
+  nodeVisited.append(problem.getStartState());
+  queue.push([problem.getStartState(), '', heuristic(problem.getStartState(), problem)], 0);
+  parentMap = {};
+  while (not queue.isEmpty()):
+    nextNode = queue.pop();
+    nextPos = nextNode[0];
+    nextAction = nextNode[1];
+    nextCost = nextNode[2];
+    if (problem.isGoalState(nextPos)):
+      cur = nextPos;
+      actions = [];
+      while (1):
+          temp = parentMap.get(cur);
+          if (temp == None):
+              break;
+          cur = temp[0];
+          actions.append(temp[1]);
+      actions.reverse();
+      actions.append(nextAction);
+      actions.remove('');
+      return actions;
+    adjacent = problem.getSuccessors(nextPos);
+    length = len(adjacent);
+    for i in range(0, length):
+      v = adjacent[i];
+      searchNode = search(queue, [v[0], v[1]]);
+      newCost = nextCost+v[2];
+      f = newCost+heuristic(v[0], problem);
+      if (not (v[0] in nodeVisited or searchNode[0])):
+        nodeVisited.append(v[0]);
+        queue.push([v[0], v[1], newCost], f);
+        parentMap[v[0]] = [nextPos, nextAction];
+      elif (searchNode[0] and searchNode[1] > newCost):
+        del queue.heap[searchNode[2]];
+        queue.push([v[0], v[1], newCost], f);
+        parentMap[v[0]] = [nextPos, nextAction];  
     
   
 # Abbreviations
