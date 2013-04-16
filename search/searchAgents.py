@@ -277,16 +277,22 @@ class CornersProblem(search.SearchProblem):
     self._expanded = 0 # Number of search nodes expanded
     
     "*** YOUR CODE HERE ***"
+    self.goal = [False, False, False, False];
+    self.start = (self.startingPosition, tuple(self.goal));
+    
     
   def getStartState(self):
     "Returns the start state (in your state space, not the full Pacman state space)"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return self.start;
     
   def isGoalState(self, state):
     "Returns whether this search state is a goal state of the problem"
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    for i in range(0, 4):
+        if state[1][i] == False:
+            return False;
+    return True;    
        
   def getSuccessors(self, state):
     """
@@ -310,7 +316,16 @@ class CornersProblem(search.SearchProblem):
       #   hitsWall = self.walls[nextx][nexty]
       
       "*** YOUR CODE HERE ***"
-      
+      x,y = state[0];
+      dx, dy = Actions.directionToVector(action)
+      nextx, nexty = int(x + dx), int(y + dy)
+      if not self.walls[nextx][nexty]:
+        nextState = (nextx, nexty)
+        nextGoal = list(state[1][:]);
+        for i in range(0, 4):
+            if nextState == self.corners[i]:
+                nextGoal[i] = True;
+        successors.append( ( (nextState, tuple(nextGoal)), action, 1) )
     self._expanded += 1
     return successors
 
@@ -346,7 +361,27 @@ def cornersHeuristic(state, problem):
   walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
   
   "*** YOUR CODE HERE ***"
-  return 0 # Default to trivial solution
+  goal = state[1];
+  currentPosition = state[0];
+  heuristic = 0;
+  rankQueue = util.PriorityQueue();
+  leftToReach = [];
+  for i in range(0, 4):
+      if (not goal[i]):
+          leftToReach.append(corners[i]);
+  length = len(leftToReach);
+  if (length != 0):
+      import itertools;
+      allPossibleOrdering = itertools.permutations(leftToReach, length);
+      for state in allPossibleOrdering:
+          temp = util.manhattanDistance(currentPosition, state[0]);
+          for i in range(1, length-1):
+              temp += util.manhattanDistance(state[i], state[i+1]);
+          rankQueue.push(temp, temp);
+      heuristic = rankQueue.pop();
+  return heuristic # Default to trivial solution
+
+
 
 class AStarCornersAgent(SearchAgent):
   "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -437,7 +472,47 @@ def foodHeuristic(state, problem):
   """
   position, foodGrid = state
   "*** YOUR CODE HERE ***"
-  return 0
+  # build the graph. 
+  vertexes, edges = buildGraph(position, foodGrid);
+  sets = [];
+  # construct a list of sets. Each set contains a single vertex. 
+  for vertex in vertexes:
+      newSet = set();
+      newSet.add(vertex);
+      sets.append(newSet);
+  output = [];
+  totalLength = 0;
+  sizeOfVertexes = len(vertexes);
+  while (len(output) < sizeOfVertexes - 1):
+      edge = edges.pop();
+      u, v = edge[0];
+      w = edge[1];
+      for eachSet in sets:
+          if (u in eachSet):
+              uSet = eachSet;
+          if (v in eachSet):
+              vSet = eachSet;
+      if (uSet == vSet): continue;
+      output.append((u, v));
+      totalLength += w;
+      sets.remove(uSet);
+      sets.remove(vSet);
+      sets.append(uSet | vSet);
+  return totalLength;
+  
+def buildGraph(position, foodGrid):
+    listOfNode = foodGrid.asList();
+    listOfNode.append(position);
+    v = set();
+    e = util.PriorityQueue();
+    while(len(listOfNode) != 0):
+        node = listOfNode.pop();
+        v.add(node);
+        for otherNode in listOfNode:
+            w = util.manhattanDistance(node, otherNode);
+            e.push(((node, otherNode), w), w);
+    return (v, e);
+    
   
 class ClosestDotSearchAgent(SearchAgent):
   "Search for all food using a sequence of searches"
@@ -465,7 +540,8 @@ class ClosestDotSearchAgent(SearchAgent):
     problem = AnyFoodSearchProblem(gameState)
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return search.astar(problem);
+    
   
 class AnyFoodSearchProblem(PositionSearchProblem):
   """
@@ -499,9 +575,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
     that will complete the problem definition.
     """
     x,y = state
-    
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return self.food[x][y];
 
 ##################
 # Mini-contest 1 #
