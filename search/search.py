@@ -149,6 +149,7 @@ def breadthFirstSearch(problem):
       actions.reverse();
       actions.append(nextAction);
       actions.remove('');
+#      print "actions: ", actions;
       return actions;
     adjacent = problem.getSuccessors(nextPos);
     length = len(adjacent);
@@ -225,6 +226,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
   queue = util.PriorityQueue();
   nodeVisited.append(problem.getStartState());
   queue.push([problem.getStartState(), '', heuristic(problem.getStartState(), problem)], 0);
+#  if (heuristic(problem.getStartState(), problem) > 27):
+#      print "inadmissible heuristic";
   parentMap = {};
   while (not queue.isEmpty()):
     nextNode = queue.pop();
@@ -243,6 +246,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
       actions.reverse();
       actions.append(nextAction);
       actions.remove('');
+  #    print "actions: ", actions;
       return actions;
     adjacent = problem.getSuccessors(nextPos);
     length = len(adjacent);
@@ -251,6 +255,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
       searchNode = search(queue, [v[0], v[1]]);
       newCost = nextCost+v[2];
       f = newCost+heuristic(v[0], problem);
+#      if (heuristic(nextPos, problem) > 27):
+#          print "inadmissible heuristic", nextPos, heuristic(nextPos, problem);
+#      if (heuristic(nextPos, problem) > v[2] + heuristic(v[0], problem)):
+#          print "inconsistent heuristic!";
+#          print "Previous h: ", heuristic(nextPos, problem), "present cost: ", v[2], "new h: ", heuristic(v[0], problem); 
       if (not (v[0] in nodeVisited or searchNode[0])):
         nodeVisited.append(v[0]);
         queue.push([v[0], v[1], newCost], f);
