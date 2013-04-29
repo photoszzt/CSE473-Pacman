@@ -29,7 +29,7 @@ class SearchProblem:
     
   def isGoalState(self, state):
      """
-       state: Search state
+     state: Search state
     
      Returns True if and only if the state is a valid goal state
      """
@@ -65,7 +65,7 @@ def tinyMazeSearch(problem):
   from game import Directions
   s = Directions.SOUTH
   w = Directions.WEST
-  return  [s,s,w,s,w,w,s,w]
+  return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
     """
@@ -253,8 +253,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     for i in range(0, length):
       v = adjacent[i];
       searchNode = search(queue, [v[0], v[1]]);
-      newCost = nextCost+v[2];
-      f = newCost+heuristic(v[0], problem);
+      newCost = nextCost + v[2];
+      f = newCost + heuristic(v[0], problem);
 #      if (heuristic(nextPos, problem) > 27):
 #          print "inadmissible heuristic", nextPos, heuristic(nextPos, problem);
 #      if (heuristic(nextPos, problem) > v[2] + heuristic(v[0], problem)):
