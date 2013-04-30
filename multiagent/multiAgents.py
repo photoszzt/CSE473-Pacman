@@ -179,110 +179,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
       actionMap[v] = action;
     #print "value: ", max(actionMap.keys());  
     return actionMap[max(actionMap.keys())];
-    
-# class AlphaBetaState:
-#    
-#       def __init__(self, value, action):
-#           self.value = value;
-#           self.action = action;
-#           
-#       def __repr__(self):
-#           return "value: "+str(self.value)+" action: "+str(self.action);
-#       
-#       def __lt__(self, other):
-#           if (self.value < other.value):
-#             return True;
-#           else:
-#             return False;
-#       
-#       def __le__(self, other):
-#           if (self.value <= other.value):
-#               return True;
-#           else:
-#               return False;
-#       
-#       def __eq__(self, other):
-#           if (self.value == other.value):
-#               return True;
-#           else:
-#               return False;
-#       
-#       def __ne__(self, other):
-#           if (self.value != other.value):
-#               return True;
-#           else:
-#               return False;
-#       
-#       def __gt__(self, other):
-#           if (self.value > other.value):
-#               return True;
-#           else:
-#               return False;
-#       
-#       def __ge__(self, other):
-#           if (self.value >= other.value):
-#               return True;
-#           else:
-#               return False;
-      
-      
-    
-  
-     
+         
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
     Your minimax agent with alpha-beta pruning (question 3)
   """
-   
-#   def alphabeta(self, state, action, agent, depth, alpha, beta):
-#     if (state.isWin() or state.isLose() or depth == self.depth * state.getNumAgents()):
-#       return AlphaBetaState(self.evaluationFunction(state), action);
-#     elif agent == self.index:
-#       return self.max_val(state, agent, depth, alpha, beta);
-#     else: 
-#       return self.min_val(state, agent, depth, alpha, beta);
-#      
-#   def max_val(self, state, agent, depth, alpha, beta):
-#       v = AlphaBetaState(float('-inf'), Directions.STOP);
-#       actions = state.getLegalActions(agent);
-#       if (Directions.STOP in actions):
-#         actions.remove(Directions.STOP);
-#       for action in actions:
-#         temp = self.alphabeta(state.generateSuccessor(agent, action), action, (agent + 1) % state.getNumAgents(), depth + 1, alpha, beta);
-#         temp.action = action;
-#         v = max(v, temp);
-#         if (v.value >= beta):
-#           return v;
-#         alpha = max(alpha, v.value);
-#       return v; 
-#    
-#   def min_val(self, state, agent, depth, alpha, beta):
-#       v = AlphaBetaState(float('inf'), Directions.STOP);
-#       actions = state.getLegalActions(agent);
-#       if (Directions.STOP in actions):
-#         actions.remove(Directions.STOP);
-#       for action in actions:
-#         temp = self.alphabeta(state.generateSuccessor(agent, action), action, (agent + 1) % state.getNumAgents(), depth + 1, alpha, beta);
-#         temp.action = action;
-#         v = min(v, temp);
-#         if v.value <= alpha:
-#           return v;
-#         beta = min(v.value, beta);
-#       return v;
-#   
-#   def getAction(self, gameState):
-#     """
-#       Returns the minimax action using self.depth and self.evaluationFunction
-#     """
-#     "*** YOUR CODE HERE ***"
-#     agent = 0;
-#     depth = 0;
-#     alpha = float('-inf');
-#     beta = float('inf');
-#     action = Directions.STOP;
-#     v = self.alphabeta(gameState, action, agent, depth, alpha, beta);
-#     #print "selected v: ", v.value;
-#     return v.action;
   def alphabeta(self, state, action, agent, depth, alpha, beta):
     if (state.isWin() or state.isLose() or depth == self.depth * state.getNumAgents()):
       return [self.evaluationFunction(state), action];
