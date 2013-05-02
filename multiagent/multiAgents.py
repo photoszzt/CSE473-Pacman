@@ -307,6 +307,7 @@ def betterEvaluationFunction(currentGameState):
   newGhostStates = currentGameState.getGhostStates()
   newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
   scareTime = 0;
+  # calculate the scare time of the ghost
   for i in newScaredTimes:
     scareTime += i;
   foodList = oldFood.asList();
@@ -319,30 +320,15 @@ def betterEvaluationFunction(currentGameState):
   
   ghostPos = [x.getPosition() for x in newGhostStates];
   if (len(ghostPos) == 0):
-      ghostDist = 0;
+      ghostDist = 0; # no ghost, no penalty or reward for near the ghost or eating ghost when ghost is scared. 
   else:
       ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos)));
       ghostDist = util.manhattanDistance(currentPos, ghostPos[0]);
-  h = 0;
-  h += currentGameState.getScore() - float(foodDist);    
+  h = currentGameState.getScore() - foodDist;    
   if (scareTime > 0):
-    return h + 4.5*ghostDist;     
+    return h + ghostDist + scareTime;     
   else:
-    return h - 4.5*ghostDist;
-#     if (util.manhattanDistance(currentPos, foodList[0]) == 0):
-#       inverseFoodDist = 2.0;
-#     else:
-#       inverseFoodDist = 1/util.manhattanDistance(currentPos, foodList[0]);
-#   # away from the ghost
-#   ghostPos = [x.getPosition() for x in newGhostStates];
-#   if (len(ghostPos) == 0):
-#       inverseGhostDist = 0;
-#   else:
-#       ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos)));
-#       if util.manhattanDistance(currentPos, ghostPos[0]) == 0:
-#         return -9999;
-#       inverseGhostDist = 1/util.manhattanDistance(currentPos, ghostPos[0]);
-#   return inverseFoodDist - inverseGhostDist;
+    return h - ghostDist;
 
     
   
