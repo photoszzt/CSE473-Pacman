@@ -74,15 +74,18 @@ class ReflexAgent(Agent):
     foodDist = util.manhattanDistance(newPos, foodList[0]);
     # away from the ghost
     ghostPos = [x.getPosition() for x in newGhostStates];
-    ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, newPos) - util.manhattanDistance(y, newPos)));
-    ghostDist = util.manhattanDistance(newPos, ghostPos[0]);
-    if (ghostDist == 0):
-      return -9999; # ghost is on this position, keep away from it. 
+    if (len(ghostPos) == 0):
+      inverseGhostDist = 0;
+    else:
+      ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, newPos) - util.manhattanDistance(y, newPos)));
+      if util.manhattanDistance(newPos, ghostPos[0]) == 0:
+        return -9999;
+      inverseGhostDist = 1/util.manhattanDistance(newPos, ghostPos[0]); 
     if (foodDist == 0):
       # The minimum step to the food is 0.5
-      return 2.0 - 1/ghostDist; 
+      return 2.0 - inverseGhostDist; 
     else:
-      return 1.0/(foodDist) - 1/ghostDist;
+      return 1.0/(foodDist) - inverseGhostDist;
     
     
  
@@ -292,33 +295,56 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     
  
 def betterEvaluationFunction(currentGameState):
-  """
-    Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-    evaluation function (question 5).
- 
-    DESCRIPTION: <write something here so we know what you did>
-  """
-  "*** YOUR CODE HERE ***"
+#   """
+#     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
+#     evaluation function (question 5).
+#  
+#     DESCRIPTION: <write something here so we know what you did>
+#   """
+#   "*** YOUR CODE HERE ***"
   currentPos = currentGameState.getPacmanPosition()
   oldFood = currentGameState.getFood()
   newGhostStates = currentGameState.getGhostStates()
   newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+  scareTime = 0;
+  for i in newScaredTimes:
+    scareTime += i;
   foodList = oldFood.asList();
-  foodList.sort(lambda x, y: util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos));
+  
   if (len(foodList) == 0):
     foodDist = 0;
   else:
+    foodList.sort(lambda x, y: util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos));
     foodDist = util.manhattanDistance(currentPos, foodList[0]);
-  # away from the ghost
+  
   ghostPos = [x.getPosition() for x in newGhostStates];
-  ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos)));
-  ghostDist = util.manhattanDistance(currentPos, ghostPos[0]);
-  if (ghostDist == 0):
-    return -9999; # ghost is on this position, keep away from it. 
-  if (foodDist == 0):
-    return 2.0 - 1/ghostDist; 
+  if (len(ghostPos) == 0):
+      ghostDist = 0;
   else:
-    return 1.0/(foodDist) - 1/ghostDist;
+      ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos)));
+      ghostDist = util.manhattanDistance(currentPos, ghostPos[0]);
+  h = 0;
+  h += currentGameState.getScore() - float(foodDist);    
+  if (scareTime > 0):
+    return h + 4.5*ghostDist;     
+  else:
+    return h - 4.5*ghostDist;
+#     if (util.manhattanDistance(currentPos, foodList[0]) == 0):
+#       inverseFoodDist = 2.0;
+#     else:
+#       inverseFoodDist = 1/util.manhattanDistance(currentPos, foodList[0]);
+#   # away from the ghost
+#   ghostPos = [x.getPosition() for x in newGhostStates];
+#   if (len(ghostPos) == 0):
+#       inverseGhostDist = 0;
+#   else:
+#       ghostPos.sort(lambda x, y: int(util.manhattanDistance(x, currentPos) - util.manhattanDistance(y, currentPos)));
+#       if util.manhattanDistance(currentPos, ghostPos[0]) == 0:
+#         return -9999;
+#       inverseGhostDist = 1/util.manhattanDistance(currentPos, ghostPos[0]);
+#   return inverseFoodDist - inverseGhostDist;
+
+    
   
    
 # Abbreviation
