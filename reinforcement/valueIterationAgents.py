@@ -6,7 +6,7 @@
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
-import mdp, util
+import mdp, util, copy
 
 from learningAgents import ValueEstimationAgent
 
@@ -38,10 +38,13 @@ class ValueIterationAgent(ValueEstimationAgent):
      
     "*** YOUR CODE HERE ***"
     for r in range(self.iterations):
+      lastVal = copy.deepcopy(self.values);
       for s in self.mdp.getStates():
-        self.count = util.Counter();
-        argMax = self.getPolicy(s);
-        self.values[s] = self.count[argMax];      
+        count = util.Counter();
+        for a in self.mdp.getPossibleActions(s):
+          for s2 in self.mdp.getStates():
+            count[a] += self.T(s, a, s2)*(self.mdp.getReward(s, a, s2) + self.discount*lastVal[s2]);
+        self.values[s] = count[count.argMax()];  
     
   def T(self, s1, a, s2):
     for pairs in self.mdp.getTransitionStatesAndProbs(s1, a):
@@ -79,12 +82,13 @@ class ValueIterationAgent(ValueEstimationAgent):
       terminal state, you should return None.
     """
     "*** YOUR CODE HERE ***"
+    count = util.Counter();
     for a in self.mdp.getPossibleActions(state):
-      self.count[a] = self.getQValue(state, a);
-    if self.count == {}:
+      count[a] = self.getQValue(state, a);
+    if count == {}:
       return None;
     else:
-      return self.count.argMax();
+      return count.argMax();
 
   def getAction(self, state):
     "Returns the policy at the state (no exploration)."
