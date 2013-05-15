@@ -42,15 +42,9 @@ class ValueIterationAgent(ValueEstimationAgent):
       for s in self.mdp.getStates():
         count = util.Counter();
         for a in self.mdp.getPossibleActions(s):
-          for s2 in self.mdp.getStates():
-            count[a] += self.T(s, a, s2)*(self.mdp.getReward(s, a, s2) + self.discount*lastVal[s2]);
+          for pairs in self.mdp.getTransitionStatesAndProbs(s, a):
+            count[a] += pairs[1]*(self.mdp.getReward(s, a, pairs[0]) + self.discount*lastVal[pairs[0]]);
         self.values[s] = count[count.argMax()];  
-    
-  def T(self, s1, a, s2):
-    for pairs in self.mdp.getTransitionStatesAndProbs(s1, a):
-      if (pairs[0] == s2):
-        return pairs[1];
-    return 0;
     
   def getValue(self, state):
     """
@@ -69,8 +63,8 @@ class ValueIterationAgent(ValueEstimationAgent):
     """
     "*** YOUR CODE HERE ***"
     q = 0;
-    for s2 in self.mdp.getStates():
-      q += self.T(state, action, s2)*(self.mdp.getReward(state, action, s2) + self.discount*self.values[s2]);
+    for pairs in self.mdp.getTransitionStatesAndProbs(state, action):
+      q += pairs[1]*(self.mdp.getReward(state, action, pairs[0]) + self.discount*self.values[pairs[0]]);
     return q;
 
   def getPolicy(self, state):
