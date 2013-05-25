@@ -118,7 +118,8 @@ class ExactInference(InferenceModule):
     allPossible = util.Counter()
     for p in self.legalPositions:
       trueDistance = util.manhattanDistance(p, pacmanPosition)
-      if emissionModel[trueDistance] > 0: allPossible[p] = 1.0
+      if emissionModel[trueDistance] > 0: 
+        allPossible[p] = self.beliefs[p]*emissionModel[trueDistance];
     allPossible.normalize()
         
     "*** YOUR CODE HERE ***"
@@ -169,7 +170,7 @@ class ExactInference(InferenceModule):
     """
     
     "*** YOUR CODE HERE ***"
-
+    
   def getBeliefDistribution(self):
     return self.beliefs
 
