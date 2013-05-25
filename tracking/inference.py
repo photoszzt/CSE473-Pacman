@@ -170,6 +170,14 @@ class ExactInference(InferenceModule):
     """
     
     "*** YOUR CODE HERE ***"
+    allPossible = util.Counter();
+    for p in self.legalPositions:
+      oldPos = p;
+      newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos));
+      for newPos in newPosDist:
+        allPossible[newPos] += newPosDist[newPos]*self.beliefs[oldPos];
+    allPossible.normalize();
+    self.beliefs = allPossible;
     
   def getBeliefDistribution(self):
     return self.beliefs

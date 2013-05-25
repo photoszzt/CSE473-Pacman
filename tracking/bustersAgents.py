@@ -108,5 +108,10 @@ class GreedyBustersAgent(BustersAgent):
     livingGhostPositionDistributions = [beliefs for i,beliefs
                                         in enumerate(self.ghostBeliefs)
                                         if livingGhosts[i+1]]
+    print "pacmanPosition: ", pacmanPosition;
+    print "legal: ", legal;
+    print "livingGhosts: ", livingGhosts;
+    print "livingGhostPositionDistributions: ", livingGhostPositionDistributions;
+    
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
