@@ -206,6 +206,8 @@ class ParticleFilter(InferenceModule):
     emissionModel = busters.getObservationDistribution(observation)
     pacmanPosition = gameState.getPacmanPosition()
     "*** YOUR CODE HERE ***"
+    if (allPossible.totalCount() == 0):
+      self.initializeUniformly(gameState);
       
     allPossible = util.Counter()
     for p in self.legalPositions:
