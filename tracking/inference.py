@@ -195,28 +195,31 @@ class ParticleFilter(InferenceModule):
     "Initializes a list of particles."
     self.numParticles = numParticles
     "*** YOUR CODE HERE ***"
-    self.particles = util.Counter();
-    for i in range(0, self.numParticles):
-      self.particles[random.choice(self.legalPositions)] += 1;
-    self.particles.normalize();
-    
+    #self.particles = util.Counter();
+    #for i in range(0, self.numParticles):
+    #  self.particles[random.choice(self.legalPositions)] += 1;
+    #self.particles.normalize();
+    self.particles = []
+    for i in range(self.numParticles):
+      self.particles.append(random.choice(self.legalPositions));
+
   
   def observe(self, observation, gameState):
     "Update beliefs based on the given distance observation."
     emissionModel = busters.getObservationDistribution(observation)
     pacmanPosition = gameState.getPacmanPosition()
-    "*** YOUR CODE HERE ***"
-    if (allPossible.totalCount() == 0):
-      self.initializeUniformly(gameState);
-      
-    allPossible = util.Counter()
-    for p in self.legalPositions:
+    "*** YOUR CODE HERE ***"      
+    allPossible = util.Counter();
+    belief = self.getBeliefDistribution();
+    for p in belief:
       trueDistance = util.manhattanDistance(p, pacmanPosition)
       if emissionModel[trueDistance] > 0: 
-        allPossible[p] = self.particles[p]*emissionModel[trueDistance];
+        allPossible[p] = belief[p]*emissionModel[trueDistance];
     allPossible.normalize()
-    self.particles = allPossible
-    
+    newParticles = [];
+    for i in range(self.numParticles):
+      newParticles.append(util.sample(allPossible));
+    self.particles = newParticles;
     
   def elapseTime(self, gameState):
     """
@@ -231,13 +234,11 @@ class ParticleFilter(InferenceModule):
     position.
     """
     "*** YOUR CODE HERE ***"
-    allPossible = util.Counter();
-    for p in self.legalPositions:
+    newParticles = [];
+    for p in self.particles:
       newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, p));
-      for newPos in newPosDist:
-        allPossible[newPos] += newPosDist[newPos]*self.particles[p];
-    allPossible.normalize();
-    self.particles = allPossible;
+      newParticles.append(util.sampleFromCounter(newPosDist)); 
+    self.particles = newParticles;
 
   def getBeliefDistribution(self):
     """
@@ -245,7 +246,11 @@ class ParticleFilter(InferenceModule):
     ghost locations conditioned on all evidence and time passage.
     """
     "*** YOUR CODE HERE ***"
-    return self.particles; 
+    #return self.particles; 
+    dist = util.Counter()
+    for part in self.particles: dist[part] += 1
+    dist.normalize()
+    return dist
 
 class MarginalInference(InferenceModule):
   "A wrapper around the JointInference module that returns marginal beliefs about ghosts."
@@ -373,23 +378,22 @@ class JointParticleFilter:
 
     "*** YOUR CODE HERE ***"
     allWeight = util.Counter();
-    for p in range(0, self.numParticles):
-      weight = 1;
-      for i in range(0, self.numGhosts):
+    for p in range(self.numParticles):
+      weight = 0;
+      for i in range(self.numGhosts):
         trueDistance = util.manhattanDistance(self.particles[p][i], pacmanPosition);
         if emissionModels[i][trueDistance] > 0: 
-          weight *= emissionModels[i][trueDistance];
-      allWeight[self.particles[p]] += weight;
-    allWeight.normalize();
+          weight += emissionModels[i][trueDistance];
+      allWeight[self.particles[p]] = weight;
+    #allWeight.normalize();
     
-    self.particles = [];
     if allWeight.totalCount() == 0:
       self.initializeParticles();
-    else: 
-      ## resample
+    else:
+      self.particles = [];
       for j in range(self.numParticles):
-        self.particles.append(util.sampleFromCounter(allWeight));
-    
+        self.particles.append(tuple(util.sampleFromCounter(allWeight)));
+
     checkedParticles = [];    
     ## check for ghost eaten by the Pacman
     for p in range(self.numParticles):
@@ -398,8 +402,8 @@ class JointParticleFilter:
         if noisyDistances[i] == 999:
           particle[i] = (2 * i + 1, i);
       checkedParticles.append(tuple(particle));
-    self.particles = self.checkedParticles;
-
+    self.particles = checkedParticles;
+      
   def getBeliefDistribution(self):
     dist = util.Counter()
     for part in self.particles: dist[part] += 1
